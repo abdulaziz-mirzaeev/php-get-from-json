@@ -5,6 +5,20 @@ function selectNodes($selector, $json) {
     $array = json_decode($json, true);
     $stringNodes = explode(',', $selector);
 
+    $stringNodes = array_filter($stringNodes, function ($node) use ($array) {
+        $keys = explode('.', $node);
+        $extra = $array;
+        $exists = true;
+        foreach ($keys as $key) {
+            $extra = $extra[$key];
+            if (!(isset($extra) && $extra)) {
+                $exists = false;
+                break;
+            }
+        }
+        return $exists;
+    });
+
     $getExactParam = function ($parampath, $array) {
         $paramArr = explode('.', $parampath);
         $paramArr = array_filter($paramArr, function ($item){ return strlen($item) > 0;});
@@ -16,6 +30,25 @@ function selectNodes($selector, $json) {
 
         return $param;
     };
+
+    function array_merge_recursive_distinct ( array &$array1, array &$array2 )
+    {
+        $merged = $array1;
+
+        foreach ( $array2 as $key => &$value )
+        {
+            if ( is_array ( $value ) && isset ( $merged [$key] ) && is_array ( $merged [$key] ) )
+            {
+                $merged [$key] = array_merge_recursive_distinct ( $merged [$key], $value );
+            }
+            else
+            {
+                $merged [$key] = $value;
+            }
+        }
+
+        return $merged;
+    }
 
     $node_values = array_map(function ($item) use ($getExactParam, $array) {
         return $getExactParam($item, $array);
@@ -29,10 +62,10 @@ function selectNodes($selector, $json) {
         foreach ($keys as $key) {
             $temp = [$key => $temp];
         }
-        $result = array_merge_recursive($result, $temp);
+        $result = array_merge_recursive_distinct($result, $temp);
     }
 
-    return json_encode($result);
+    return json_encode($result, JSON_UNESCAPED_SLASHES);
 
 }
 
