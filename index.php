@@ -1,4 +1,6 @@
 <?php
+$answer = '';
+
 function selectNodes($selector, $json) {
     $array = json_decode($json, true);
     $stringNodes = explode(',', $selector);
@@ -34,11 +36,13 @@ function selectNodes($selector, $json) {
 
 }
 
-$json = $_POST['json'];
+$json = $_POST['json'] ?? '';
 
-$selector = $_POST['selector'];
+$selector = $_POST['selector'] ?? '';
 
-$answer = selectNodes($selector, $json);
+if ($json && $selector) {
+    $answer = selectNodes($selector, $json);
+}
 ?>
 
 <!doctype html>
@@ -53,10 +57,10 @@ $answer = selectNodes($selector, $json);
 <body>
 <form action="/" method="post">
     <label for="json">JSON array</label><br>
-    <textarea id="json" name="json" cols="30" rows="10"></textarea><br>
+    <textarea id="json" name="json" cols="30" rows="10"><?php echo $json ?></textarea><br>
 
     <label for="selector">Selector</label><br>
-    <input id="selector" name="selector" type="text" style="width: 250px"><br>
+    <input id="selector" name="selector" type="text" style="width: 250px" value="<?php echo $selector ?>"><br>
 
     <input type="submit">
 </form>
