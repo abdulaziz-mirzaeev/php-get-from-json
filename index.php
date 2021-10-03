@@ -10,11 +10,11 @@ function selectNodes($selector, $json) {
         $extra = $array;
         $exists = true;
         foreach ($keys as $key) {
-            $extra = $extra[$key];
-            if (!(isset($extra) && $extra)) {
+            if (!(isset($extra[$key]) && $extra[$key])) {
                 $exists = false;
                 break;
             }
+            $extra = $extra[$key];
         }
         return $exists;
     });
