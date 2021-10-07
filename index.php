@@ -60,7 +60,11 @@ function selectNodes($selector, $json) {
         $temp = $node_values[$i];
 
         foreach ($keys as $key) {
-            $temp = [$key => $temp];
+            if (is_numeric($key)) {
+                $temp = [$temp];
+            } else {
+                $temp = [$key => $temp];
+            }
         }
         $result = array_merge_recursive_distinct($result, $temp);
     }
