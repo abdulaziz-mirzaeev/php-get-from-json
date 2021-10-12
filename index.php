@@ -60,14 +60,36 @@ function selectNodes($selector, $json) {
         $temp = $node_values[$i];
 
         foreach ($keys as $key) {
-            if (is_numeric($key)) {
-                $temp = [$temp];
-            } else {
-                $temp = [$key => $temp];
-            }
+//            if (is_numeric($key)) {
+//                $temp = [$temp];
+//            } else {
+//            }
+            $temp = [$key => $temp];
         }
         $result = array_merge_recursive_distinct($result, $temp);
     }
+
+
+    function removeNumericKeys($array) {
+        $keys = array_keys($array);
+        $allKeysCount = count($keys);
+
+        $filteredKeysCount = count(array_filter($keys, function ($key) { return is_numeric($key); }));
+
+        if ($allKeysCount == $filteredKeysCount) {
+            $array = array_values($array);
+        }
+
+        foreach ($array as $key => $item) {
+            if (is_array($item)) {
+                $array[$key] = removeNumericKeys($item);
+            }
+        }
+
+        return $array;
+    }
+
+    $result = removeNumericKeys($result);
 
     return json_encode($result, JSON_UNESCAPED_SLASHES);
 
